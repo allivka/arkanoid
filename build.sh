@@ -1,2 +1,2 @@
 #!/bin/sh
-g++ src/* -o main $("pkg-config --cflags --libs opencv4")
+g++ src/* -o build/main $("pkg-config --cflags --libs opencv4")
