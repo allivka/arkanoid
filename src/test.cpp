@@ -2,17 +2,18 @@
 #include <opencv4/opencv2/opencv.hpp>
 #include <vector>
 
-std::vector<cv::Point> createTriangle(int x, int y, int angle, int l) {
-    std::vector<cv::Point> points;
+int lowHue = 0, lowSat = 0, lowVal = 0;
+int highHue = 179, highSat = 255, highVal = 255;
+
+void createSettingsWindow() {
+    cv::namedWindow("settings", cv::WINDOW_NORMAL);
     
-    points.push_back(cv::Point(x, y));
-    points.push_back(cv::Point(x + std::cos(angle / 180.0 * M_PI) * l, 
-    y + std::sin(angle / 180.0 * M_PI) * l));
-    points.push_back(cv::Point(x + l * cos((60 + angle) / 180.0 * M_PI), 
-    y + l * sin((60 + angle) / 180.0 * M_PI)));
-    
-    return points;
-    
+    cv::createTrackbar("lowHue", "settings", &lowHue, 179);
+    cv::createTrackbar("highHue", "settings", &highHue, 179);
+    cv::createTrackbar("lowSat", "settings", &lowSat, 255);
+    cv::createTrackbar("highSat", "settings", &highSat, 255);
+    cv::createTrackbar("lowVal", "settings", &lowVal, 255);
+    cv::createTrackbar("highVal", "settings", &highVal, 255);
 }
 
 int main() {
@@ -22,32 +23,42 @@ int main() {
     
     cap.open(id);
     
-    cap.set(cv::CAP_PROP_FPS, 30);
+    cap.set(cv::CAP_PROP_FPS, 60);
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 720);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 960);
     
     cv::Mat frame1;
     cv::Mat frame2;
+    cv::Mat frame3;
     cv::Mat gray;
     cv::Mat hsv;
     
     cv::namedWindow("1", cv::WINDOW_NORMAL);
     cv::namedWindow("2" , cv::WINDOW_NORMAL);
+    cv::namedWindow("3", cv::WINDOW_NORMAL);
+
     
     int key = -1;
     
     while(key != 27) {
-        key = cv::waitKey(1000 / 30);
+        key = cv::waitKey(1000 / 60);
+        
+        if(key == 115) {
+            createSettingsWindow();
+        } else if(key == 99) {
+            cv::destroyWindow("settings");
+        }
+        
         cap >> frame1;
         
-        // cv::GaussianBlur(frame1, frame2, cv::Size(7, 7), 1, 1);
+        cv::GaussianBlur(frame1, frame2, cv::Size(7, 7), 1, 1);
         // cv::medianBlur(frame1, frame2, 5);
         
         // cv::cvtColor(frame2, gray, cv::COLOR_BGR2GRAY);
         
-        cv::cvtColor(frame1, hsv, cv::COLOR_BGR2HSV);
+        cv::cvtColor(frame2, hsv, cv::COLOR_BGR2HSV);
         
-        cv::inRange(hsv, cv::Scalar(35, 10, 10), cv::Scalar(90, 250, 250), frame2);
+        cv::inRange(hsv, cv::Scalar(lowHue, lowSat, lowVal), cv::Scalar(highHue, highSat, highVal), frame2);
         
         // cv::threshold(gray, frame2, 150, 255, cv::THRESH_BINARY);
         
@@ -56,15 +67,20 @@ int main() {
         
         if(k == 0) continue;
         
-        double xC = m.m01 / k;
-        double yC = m.m10 / k;
+        double xC = m.m10 / k;
+        double yC = m.m01 / k;
         
-        cv::circle(frame1, cv::Point(yC, xC), 50, cv::Scalar(0, 0, 255), 10);
+        cv::cvtColor(frame2, frame2, cv::COLOR_GRAY2BGR);
         
+        frame3 = frame1 & frame2;
+        
+        cv::circle(frame1, cv::Point(xC, yC), 50, cv::Scalar(0, 0, 255), 10);
         
         cv::imshow("1", frame1);
         
         cv::imshow("2", frame2);
+        
+        cv::imshow("3", frame3);
     }
     
     cv::destroyAllWindows();
