@@ -10,21 +10,42 @@
 #include <cstdlib>
 
 class Command {
-public:
-    bool isKick = false;
-    bool direction = false;
+private:
     uint8_t intensity = 0; //values from 0 to 63
     
-    Command(const bool& b1, const bool& b2, const uint8_t& b38) : isKick(b1), direction(b2), intensity(b38) {}
+public:
+    
+    bool isKick = false;
+    bool direction = false;
+    
+    Command() = default;
+    
+    Command(const bool& p_isKick, const bool& p_direction, const uint8_t& p_intensity) 
+    : isKick(p_isKick), direction(p_direction), intensity(p_intensity < 63 ? p_intensity : 63) {}
+    
+    Command(const uint8_t& data) {
+        isKick = data & (1 << 7);
+        direction = data & (1 << 6);
+        intensity = (data ^ ((1 << 7) | (1 << 6)));
+    }
+    
+    void setIntensity(const uint8_t& p) {
+        intensity = p < 63 ? p : 63;
+    }
+    
+    uint8_t getIntensity() const {
+        return intensity;
+    }
     
     uint8_t convertToByte() const {
         uint8_t result = intensity;
         
         result |= (1 * (isKick)) << 7;
-        result |= (1 * (isKick)) << 7;
+        result |= (1 * (isKick)) << 6;
         
         return result;
     }
+    
 };
 
 class Esp32UDP {
@@ -82,10 +103,12 @@ int main() {
     espAddr.sin_port = htons(80),
     espAddr.sin_addr.s_addr = inet_addr("192.168.4.1");
     
-    if(Esp32UDP::establishConnection(thisAddr, espAddr)) {
-        perror("Failed establishing UDP connection with esp32");
-        exit(EXIT_FAILURE);
-    }
+    // if(Esp32UDP::establishConnection(thisAddr, espAddr)) {
+    //     perror("Failed establishing UDP connection with esp32");
+    //     exit(EXIT_FAILURE);
+    // }
+    
+    close(Esp32UDP::socketFd);
     
     exit(EXIT_SUCCESS);
     
