@@ -5,8 +5,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <ctime>
-#include <time.h>
 #include <unistd.h>
 
 int main() {
@@ -22,19 +20,20 @@ int main() {
         exit(EXIT_FAILURE);
     }
     
-    sockaddr_in clientAddr;
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(80);
-    addr.sin_addr.s_addr = inet_addr("192.168.4.1");
+    sockaddr_in espAddr = {
+        .sin_family = AF_INET,
+        .sin_port = htons(80),
+        .sin_addr.s_addr = inet_addr("192.168.4.1")
+    };
     
-    if(connect(socketFd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+    if(connect(socketFd, (struct sockaddr*)&espAddr, sizeof(espAddr)) < 0) {
         perror("bind");
         exit(EXIT_FAILURE);
     }
     
     int bytesSent = 0;
     
-    uchar buffer = 1;
+    uchar buffer = 0;
     
     while(bytesSent != sizeof(buffer)) {
         bytesSent = send(socketFd, &buffer, sizeof(buffer), MSG_DONTROUTE);
