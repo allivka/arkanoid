@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(
-    opencv
+    arkanoid
     VERSION 0.0.0
     LANGUAGES CXX
 )
@@ -19,6 +19,7 @@ endif()
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_executable(test src/test.cpp)
-
 target_link_libraries(test ${OpenCV_LIBS})
 
+add_executable(server src/server.cpp)
+target_link_libraries(server ${OpenCV_LIBS})
