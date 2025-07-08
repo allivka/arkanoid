@@ -138,8 +138,8 @@ std::array<cv::Point, 3> processFrame(cv::Mat frame, const ProcessingContext& co
     std::array<cv::Point, 3> positions;
     
     positions.at(0) = getObjPos(frame, context.ball);
-    positions.at(0) = getObjPos(frame, context.robot);
-    positions.at(0) = getObjPos(frame, context.enemy);
+    positions.at(1) = getObjPos(frame, context.robot);
+    positions.at(2) = getObjPos(frame, context.enemy);
     
     return positions;
 }

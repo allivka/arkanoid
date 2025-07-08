@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     ProcessingContext context;
     context.loadFromFile("data/server/config.txt");
     
-    connectEsp();
+    // connectEsp();
     
     cv::VideoCapture cap;
     cap.open(cameraId);
@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     
     int key = -1;
     
-    cv::Mat frame;
+    cv::Mat frame, pf;
     
     cv::namedWindow("display", cv::WINDOW_NORMAL);
     
@@ -24,7 +24,9 @@ int main(int argc, char *argv[]) {
         key = cv::waitKey(1000 / c.fps);
         cap >> frame;
         
-        std::array<cv::Point, 3> points = processFrame(frame, context);
+        pf = frame.clone();
+        
+        std::array<cv::Point, 3> points = processFrame(pf, context);
         
         cv::circle(frame, points.at(0), 50, cv::Scalar(0, 0, 150), 5);
         
