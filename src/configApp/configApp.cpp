@@ -121,7 +121,7 @@ void highLightBall() {
     
     cv::putText(instrFrame, "Highlight the ball", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
     
-    cv::Mat frame, drawFrame;
+    cv::Mat frame, drawFrame, hsvFrame, binFrame;
     
     cv::setMouseCallback("1", mouseCallback, &frame);
     
@@ -133,17 +133,19 @@ void highLightBall() {
         
         cv::GaussianBlur(frame, frame, cv::Size(7, 7), 1, 1);
         drawFrame = frame;
-        if(isLMBPressed) cv::rectangle(drawFrame, cv::Rect(LMBPressPos, mousePos), cv::Scalar(100, 0, 0), 10); 
-        cv::imshow("1", drawFrame);
         
-        if(hsvReceived) {
-            std::ofstream out("data/server/config.txt", std::ios::app);
-            out << (unsigned int)hsvVec[0] << '\t' << (unsigned int)hsvVec[1] << '\t' << (unsigned int)hsvVec[2] << '\n';
-            hsvReceived = false;
-            return;
-        }
+        cv::cvtColor(frame, hsvFrame, cv::COLOR_BGR2HSV);
+        cv::inRange(hsvFrame, cv::Scalar(lowHue, lowSat, lowVal), cv::Scalar(highHue, highSat, highVal), binFrame);
+        
+        if(isLMBPressed) cv::rectangle(drawFrame, cv::Rect(LMBPressPos, mousePos), cv::Scalar(100, 0, 0), 10);
+        cv::imshow("1", drawFrame);
+        cv::imshow("2", binFrame);
         
     }
+    
+    std::ofstream out("data/server/config.txt", std::ios::app);
+    
+    out << lowHue << ' ' << highHue << ' ' <<lowSat << ' ' << highSat << ' ' << lowVal << ' ' << highVal << '\n';
     
 }
 
@@ -170,7 +172,6 @@ int main(int argc, const char *argv[]) {
     
     cv::namedWindow("1", cv::WINDOW_NORMAL);
     cv::namedWindow("2" , cv::WINDOW_NORMAL);
-    cv::namedWindow("3", cv::WINDOW_NORMAL);
     
     
     highLightBall();
