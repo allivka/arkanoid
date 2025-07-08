@@ -60,7 +60,7 @@ void createSettingsWindow() {
     cv::createTrackbar("highVal", "settings", &highVal, 255);
 }
 
-void mouseCallback(int event, int x, int y, int flags, void *data) {
+static void mouseCallback(int event, int x, int y, int flags, void *data) {
     
     mousePos = cv::Point(x, y);
     
