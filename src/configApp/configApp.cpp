@@ -109,7 +109,7 @@ void initCaptureFromFile(const std::string& path) {
     
 }
 
-void highLightProcess(const cv::Mat& instrFrame) {
+void highlightProcess(const cv::Mat& instrFrame) {
     int key = -1;
     
     cv::Mat frame, drawFrame, hsvFrame, binFrame;
@@ -142,6 +142,32 @@ void highLightProcess(const cv::Mat& instrFrame) {
         
     }
     
+    
+}
+
+void highlightBall() {
+    
+    cv::Mat instrFrame = cv::Mat::zeros(300, 500, CV_8UC3);
+    
+    cv::putText(instrFrame, "highlight the ball", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
+    
+    highlightProcess(instrFrame);
+    
+    std::ofstream out("data/server/config.txt", std::ios::app);
+    
+    out << lowHue << ' ' << highHue << ' ' <<lowSat << ' ' << highSat << ' ' << lowVal << ' ' << highVal << '\n';
+    
+    std::cout << "Saved data for server!!\n";
+    
+}
+
+void highlightRobot() {
+    cv::Mat instrFrame = cv::Mat::zeros(300, 500, CV_8UC3);
+    
+    cv::putText(instrFrame, "highlight the robot", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
+    
+    highlightProcess(instrFrame);
+    
     std::ofstream out("data/server/config.txt", std::ios::app);
     
     out << lowHue << ' ' << highHue << ' ' <<lowSat << ' ' << highSat << ' ' << lowVal << ' ' << highVal << '\n';
@@ -149,30 +175,60 @@ void highLightProcess(const cv::Mat& instrFrame) {
     std::cout << "Saved data for server!!\n";
 }
 
-void highLightBall() {
-    
+void highlightEnemy() {
     cv::Mat instrFrame = cv::Mat::zeros(300, 500, CV_8UC3);
     
-    cv::putText(instrFrame, "Highlight the ball", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
+    cv::putText(instrFrame, "highlight the enemy", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
     
-    highLightProcess(instrFrame);
+    highlightProcess(instrFrame);
     
+    std::ofstream out("data/server/config.txt", std::ios::app);
+    
+    out << lowHue << ' ' << highHue << ' ' <<lowSat << ' ' << highSat << ' ' << lowVal << ' ' << highVal << '\n';
+    
+    std::cout << "Saved data for server!!\n";
 }
 
-void highLightRobot() {
+void highlightBallZone() {
     cv::Mat instrFrame = cv::Mat::zeros(300, 500, CV_8UC3);
     
-    cv::putText(instrFrame, "Highlight the robot", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
+    cv::putText(instrFrame, "highlight the ball zone", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
     
-    highLightProcess(instrFrame);
+    highlightProcess(instrFrame);
+    
+    std::ofstream out("data/server/config.txt", std::ios::app);
+    
+    out << activeRect.x << ' ' << activeRect.y << ' ' << activeRect.x + activeRect.width << ' ' << activeRect.y + activeRect.height << '\n';
+    
+    std::cout << "Saved data for server!!\n";
 }
 
-void highLightEnemy() {
+void highlightRobotZone() {
     cv::Mat instrFrame = cv::Mat::zeros(300, 500, CV_8UC3);
     
-    cv::putText(instrFrame, "Highlight the enemy", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
+    cv::putText(instrFrame, "highlight the robot zone", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
     
-    highLightProcess(instrFrame);
+    highlightProcess(instrFrame);
+    
+    std::ofstream out("data/server/config.txt", std::ios::app);
+    
+    out << activeRect.x << ' ' << activeRect.y << ' ' << activeRect.x + activeRect.width << ' ' << activeRect.y + activeRect.height << '\n';
+    
+    std::cout << "Saved data for server!!\n";
+}
+
+void highlightEnemyZone() {
+    cv::Mat instrFrame = cv::Mat::zeros(300, 500, CV_8UC3);
+    
+    cv::putText(instrFrame, "highlight the enemy zone", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
+    
+    highlightProcess(instrFrame);
+    
+    std::ofstream out("data/server/config.txt", std::ios::app);
+    
+    out << activeRect.x << ' ' << activeRect.y << ' ' << activeRect.x + activeRect.width << ' ' << activeRect.y + activeRect.height << '\n';
+    
+    std::cout << "Saved data for server!!\n";
 }
 
 int main(int argc, const char *argv[]) {
@@ -194,9 +250,9 @@ int main(int argc, const char *argv[]) {
     cv::namedWindow("2" , cv::WINDOW_NORMAL);
     
     
-    highLightBall();
-    highLightRobot();
-    highLightEnemy();
+    highlightBall();
+    highlightRobot();
+    highlightEnemy();
     
     cv::destroyAllWindows();
     
