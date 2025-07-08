@@ -6,7 +6,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <errno.h>
 #include <cstdlib>
 
 class Command {
@@ -57,25 +56,23 @@ class Esp32UDP {
     
     static int establishConnection(sockaddr_in thisAddr, sockaddr_in esp32Addr) {
         
-        int socketFd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+        int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-        if(socketFd == -1) {
-            close(socketFd);
-            socketFd = -1;
+        if(sock == -1) {
             return -1;
         }
         
-        if(bind(socketFd, (sockaddr*)&thisAddr, sizeof(thisAddr)) == -1) {
-            close(socketFd);
-            socketFd = -1;
+        if(bind(sock, (sockaddr*)&thisAddr, sizeof(thisAddr)) == -1) {
+            close(sock);
             return - 1;
         }
         
-        if(connect(socketFd, (sockaddr*)&esp32Addr, sizeof(esp32Addr)) == 1) {
-            close(socketFd);
-            socketFd = -1;
+        if(connect(sock, (sockaddr*)&esp32Addr, sizeof(esp32Addr)) == -1) {
+            close(sock);
             return - 1;
         }
+        
+        socketFd = sock;
         
         return 0;
     }
@@ -103,10 +100,21 @@ int main() {
     espAddr.sin_port = htons(80),
     espAddr.sin_addr.s_addr = inet_addr("192.168.4.1");
     
-    // if(Esp32UDP::establishConnection(thisAddr, espAddr)) {
-    //     perror("Failed establishing UDP connection with esp32");
-    //     exit(EXIT_FAILURE);
-    // }
+    if(Esp32UDP::establishConnection(thisAddr, espAddr)) {
+        perror("Failed establishing UDP connection with esp32");
+        close(Esp32UDP::socketFd);
+        exit(EXIT_FAILURE);
+    }
+    
+    int bytesSent = Esp32UDP::sendCommand(Command(1, 0, 30));
+    
+    if(bytesSent == -1) {
+        perror("Failed sending command to esp32");
+        close(Esp32UDP::socketFd);
+        exit(EXIT_FAILURE);
+    }
+    
+    printf("Successfully sent %d bytes of data", bytesSent);
     
     close(Esp32UDP::socketFd);
     
