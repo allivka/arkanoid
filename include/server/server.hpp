@@ -1,8 +1,9 @@
 #include "connection.hpp"
-#include "camera.hpp"
+#include <opencv4/opencv2/opencv.hpp>
 #include <cstring>
 #include <cstdio>
 #include <fstream>
+#include <array>
 
 void connectEsp() {
     sockaddr_in thisAddr;
@@ -36,7 +37,7 @@ void sendCom(const Command& com) {
     printf("Successfully sent %d bytes of data", bytesSent);
 }
 
-class objDetContext {
+class ObjDetContext {
 public:
 
     unsigned int lowHue = 0;
@@ -59,15 +60,15 @@ public:
     }
 };
 
-class processingContext {
+class ProcessingContext {
 public:
     
-    objDetContext ball;
-    objDetContext robot;
-    objDetContext enemy;
+    ObjDetContext ball;
+    ObjDetContext robot;
+    ObjDetContext enemy;
     
     
-    processingContext& loadFromFile(const std::string& path) {
+    ProcessingContext& loadFromFile(const std::string& path) {
         std::ifstream in(path);
         
         ball.readFromIfstream(in);
@@ -84,3 +85,61 @@ public:
     }
     
 };
+
+class CapContext {
+public:
+    int fps = 30;
+    int width = 960;
+    int height = 720;
+};
+
+CapContext setupCap(cv::VideoCapture& cap, const::std::string& path) {
+    std::ifstream in(path);
+    
+    CapContext c;
+    
+    in >> c.fps;
+    std::cout << c.fps << '\t';
+    
+    in >> c.width;
+    std::cout << c.width << '\t';
+        
+    in >> c.height;
+    std::cout << c.height << '\t';
+    
+    cap.set(cv::CAP_PROP_FPS, c.fps);
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, c.width);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, c.height);
+    
+    return c;
+}
+
+cv::Point getObjPos(const cv::Mat& frame, const ObjDetContext& context) {
+    static cv::Mat binFrame;
+    
+    cv::inRange(frame(context.zone), cv::Scalar(context.lowHue, context.lowSat, context.lowVal),
+    cv::Scalar(context.highHue, context.highSat, context.highVal), binFrame);
+    
+    cv::Moments m = cv::moments(binFrame);
+    
+    double k = m.m00;
+    double xC = m.m10 / (k + 0.01);
+    double yC = m.m01 / (k + 0.01);
+    
+    return cv::Point(xC, yC);
+}
+
+std::array<cv::Point, 3> processFrame(cv::Mat frame, const ProcessingContext& context) {
+    
+    cv::GaussianBlur(frame, frame, cv::Size(3, 3), 0, 0);
+    
+    cv::cvtColor(frame, frame, cv::COLOR_BGR2HSV);
+    
+    std::array<cv::Point, 3> positions;
+    
+    positions.at(0) = getObjPos(frame, context.ball);
+    positions.at(0) = getObjPos(frame, context.robot);
+    positions.at(0) = getObjPos(frame, context.enemy);
+    
+    return positions;
+}
