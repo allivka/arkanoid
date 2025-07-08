@@ -198,7 +198,7 @@ void highlightBallZone() {
     
     std::ofstream out("data/server/config.txt", std::ios::app);
     
-    out << activeRect.x << ' ' << activeRect.y << ' ' << activeRect.x + activeRect.width << ' ' << activeRect.y + activeRect.height << '\n';
+    out << activeRect.x << ' ' << activeRect.y << ' ' << activeRect.width << ' ' << activeRect.height << '\n';
     
     std::cout << "Saved data for server!!\n";
 }
@@ -212,7 +212,7 @@ void highlightRobotZone() {
     
     std::ofstream out("data/server/config.txt", std::ios::app);
     
-    out << activeRect.x << ' ' << activeRect.y << ' ' << activeRect.x + activeRect.width << ' ' << activeRect.y + activeRect.height << '\n';
+    out << activeRect.x << ' ' << activeRect.y << ' ' << activeRect.width << ' ' << activeRect.height << '\n';
     
     std::cout << "Saved data for server!!\n";
 }
@@ -226,7 +226,7 @@ void highlightEnemyZone() {
     
     std::ofstream out("data/server/config.txt", std::ios::app);
     
-    out << activeRect.x << ' ' << activeRect.y << ' ' << activeRect.x + activeRect.width << ' ' << activeRect.y + activeRect.height << '\n';
+    out << activeRect.x << ' ' << activeRect.y << ' ' << activeRect.width << ' ' << activeRect.height << '\n';
     
     std::cout << "Saved data for server!!\n";
 }
