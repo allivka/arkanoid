@@ -2,6 +2,7 @@
 #include <opencv4/opencv2/opencv.hpp>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 
 int lowHue = 0, lowSat = 0, lowVal = 0;
 int highHue = 179, highSat = 255, highVal = 255;
@@ -82,16 +83,38 @@ static void mouseCallback(int event, int x, int y, int flags, void *data) {
     }
 }
 
-int main() {
-    int id = 2;
+uint fps = 30;
+uint width = 960;
+uint height = 720;
+
+void initCaptureFromFile(const std::string& path, cv::VideoCapture& cap) {
+    std::ifstream in(path);
+    
+    in >> fps;
+    std::cout << fps << '\t';
+    
+    in >> width;
+    std::cout << width << '\t';
+        
+    in >> height;
+    std::cout << height << '\t';
+    
+    cap.set(cv::CAP_PROP_FPS, fps);
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+    
+}
+
+int main(int argc, const char *argv[]) {
+    int id = 0;
+    
+    if(argc == 2) id = atoi(argv[1]);
     
     cv::VideoCapture cap;
     
     cap.open(id);
     
-    cap.set(cv::CAP_PROP_FPS, 60);
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 960);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
+    initCaptureFromFile("data/configApp/config.txt", cap);
     
     cv::Mat frame1;
     cv::Mat frame2;
@@ -112,7 +135,7 @@ int main() {
     int key = -1;
     
     while(key != 27) {
-        key = cv::waitKey(1000 / 60);
+        key = cv::waitKey(1000 / fps);
         
         if(key == 115) {
             createSettingsWindow();
