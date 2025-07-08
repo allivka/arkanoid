@@ -12,17 +12,16 @@ if(NOT OpenCV_FOUND)
     message(FATAL_ERROR "OpenCV not found. Please set OpenCV_DIR.")
 endif()
 
+file(GLOB CONFIG_APP_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/configApp/*.cpp")
+add_executable(configApp ${CONFIG_APP_SOURCES})
+target_compile_options(configApp PUBLIC -Wall -Wextra)
+target_include_directories(configApp PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_include_directories(configApp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/configApp)
+target_link_libraries(configApp ${OpenCV_LIBS})
 
-
-add_executable(test test/test.cpp)
-target_compile_options(test PUBLIC -Wall -Wextra)
-target_include_directories(test PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(test ${OpenCV_LIBS})
-
-file(GLOB SERVER_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-
+file(GLOB SERVER_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/server/*.cpp")
 add_executable(server ${SERVER_SOURCES})
 target_compile_options(server PUBLIC -Wall -Wextra)
-target_include_directories(test PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_include_directories(server PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(server PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_include_directories(server PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/server)
 target_link_libraries(server ${OpenCV_LIBS})

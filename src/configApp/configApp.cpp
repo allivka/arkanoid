@@ -35,7 +35,7 @@ cv::Vec3b getMatMedianHSV(cv::Mat mat) {
     
     cv::Vec3b result;
     
-    if(h.size() % 2) {
+    if(h.size() % 2 == 0) {
         result[0] = h[((h.size() / 2) + (h.size() / 2 - 1)) / 2];
         result[1] = s[((s.size() / 2) + (s.size() / 2 - 1)) / 2];
         result[2] = v[((v.size() / 2) + (v.size() / 2 - 1)) / 2];

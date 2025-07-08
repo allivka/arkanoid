@@ -1,5 +1,7 @@
-#include <opencv4/opencv2/opencv.hpp>
 #include "connection.hpp"
+#include "camera.hpp"
+#include <cstring>
+#include <cstdio>
 
 int main() {
     sockaddr_in thisAddr;
