@@ -251,11 +251,12 @@ int main(int argc, const char *argv[]) {
     
     
     highlightBall();
-    highlightRobot();
-    highlightEnemy();
-    
     highlightBallZone();
+
+    highlightRobot();
     highlightRobotZone();
+
+    highlightEnemy();
     highlightEnemyZone();
     
     cv::destroyAllWindows();
