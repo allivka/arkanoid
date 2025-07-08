@@ -2,12 +2,12 @@
 
     
 Command::Command(const bool& p_isKick, const bool& p_direction, const uint8_t& p_intensity) 
-: isKick(p_isKick), direction(p_direction), intensity(p_intensity < 63 ? p_intensity : 63) {}
+: intensity(p_intensity < 63 ? p_intensity : 63), isKick(p_isKick), direction(p_direction) {}
 
 Command::Command(const uint8_t& data) {
     isKick = data & (1 << 7);
     direction = data & (1 << 6);
-    intensity = (data ^ ((1 << 7) | (1 << 6)));
+    intensity = data & (~((1 << 7) | (1 << 6)));
 }
 
 void Command::setIntensity(const uint8_t& p) {
@@ -22,7 +22,7 @@ uint8_t Command::convertToByte() const {
     uint8_t result = intensity;
     
     result |= (1 * (isKick)) << 7;
-    result |= (1 * (isKick)) << 6;
+    result |= (1 * (direction)) << 6;
     
     return result;
 }

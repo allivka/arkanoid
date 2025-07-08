@@ -20,7 +20,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
     
-    int bytesSent = Esp32UDP::sendCommand(Command(1, 0, 30));
+    int bytesSent = Esp32UDP::sendCommand(Command(1, 0, 22));
     
     if(bytesSent == -1) {
         perror("Failed sending command to esp32");
