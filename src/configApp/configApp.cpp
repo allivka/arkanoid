@@ -113,13 +113,8 @@ void initCaptureFromFile(const std::string& path) {
     
 }
 
-void highLightBall() {
-    
+void highLightProcess(const cv::Mat& instrFrame) {
     int key = -1;
-    
-    cv::Mat instrFrame = cv::Mat::zeros(300, 300, CV_8UC3);
-    
-    cv::putText(instrFrame, "Highlight the ball", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
     
     cv::Mat frame, drawFrame, hsvFrame, binFrame;
     
@@ -131,13 +126,21 @@ void highLightBall() {
         
         cap >> frame;
         
-        cv::GaussianBlur(frame, frame, cv::Size(7, 7), 1, 1);
+        cv::GaussianBlur(frame, frame, cv::Size(3, 3), 0, 0);
         drawFrame = frame;
         
         cv::cvtColor(frame, hsvFrame, cv::COLOR_BGR2HSV);
         cv::inRange(hsvFrame, cv::Scalar(lowHue, lowSat, lowVal), cv::Scalar(highHue, highSat, highVal), binFrame);
         
+        cv::Moments m = cv::moments(binFrame);
+        double k = m.m00;
+        
+        double xC = m.m10 / (k + 0.01);
+        double yC = m.m01 / (k + 0.01);
+        
         if(isLMBPressed) cv::rectangle(drawFrame, cv::Rect(LMBPressPos, mousePos), cv::Scalar(100, 0, 0), 10);
+        cv::circle(drawFrame, cv::Point(xC, yC), 30, cv::Scalar(0, 0, 150), 10);
+        
         cv::imshow("1", drawFrame);
         cv::imshow("2", binFrame);
         
@@ -146,6 +149,17 @@ void highLightBall() {
     std::ofstream out("data/server/config.txt", std::ios::app);
     
     out << lowHue << ' ' << highHue << ' ' <<lowSat << ' ' << highSat << ' ' << lowVal << ' ' << highVal << '\n';
+}
+
+void highLightBall() {
+    
+    int key = -1;
+    
+    cv::Mat instrFrame = cv::Mat::zeros(300, 300, CV_8UC3);
+    
+    cv::putText(instrFrame, "Highlight the ball", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
+    
+    highLightProcess(instrFrame);
     
 }
 
@@ -190,13 +204,7 @@ int main(int argc, const char *argv[]) {
         
     //     cv::inRange(hsv, cv::Scalar(lowHue, lowSat, lowVal), cv::Scalar(highHue, highSat, highVal), frame2);
         
-    //     cv::Moments m = cv::moments(frame2);
-    //     double k = m.m00;
-        
-    //     if(k == 0) continue;
-        
-    //     double xC = m.m10 / k;
-    //     double yC = m.m01 / k;
+    //     
         
     //     cv::cvtColor(frame2, frame2, cv::COLOR_GRAY2BGR);
         
