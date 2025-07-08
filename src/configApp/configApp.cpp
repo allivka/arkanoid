@@ -53,7 +53,7 @@ cv::Vec3b getMatMedianHSV(cv::Mat mat) {
 }
 
 void createSettingsWindow() {
-    cv::namedWindow("settings", cv::WINDOW_AUTOSIZE);
+    cv::namedWindow("settings", cv::WINDOW_NORMAL);
     
     cv::createTrackbar("lowHue", "settings", &lowHue, 179);
     cv::createTrackbar("highHue", "settings", &highHue, 179);
@@ -62,9 +62,6 @@ void createSettingsWindow() {
     cv::createTrackbar("lowVal", "settings", &lowVal, 255);
     cv::createTrackbar("highVal", "settings", &highVal, 255);
 }
-
-cv::Vec3b hsvVec;
-bool hsvReceived = false;
 
 static void mouseCallback(int event, int x, int y, int flags, void *data) {
     
@@ -80,8 +77,7 @@ static void mouseCallback(int event, int x, int y, int flags, void *data) {
         isLMBPressed = false;
         activeRect = cv::Rect(LMBPressPos, mousePos);
         
-        hsvVec = getMatMedianHSV((*((cv::Mat*)data))(activeRect));
-        hsvReceived = true;
+        cv::Vec3b hsvVec = getMatMedianHSV((*((cv::Mat*)data))(activeRect));
         std::cout << (int)hsvVec[0] << '\t' << (int)hsvVec[1] << '\t' << (int)hsvVec[2] << '\n';
         
         break;
@@ -149,18 +145,34 @@ void highLightProcess(const cv::Mat& instrFrame) {
     std::ofstream out("data/server/config.txt", std::ios::app);
     
     out << lowHue << ' ' << highHue << ' ' <<lowSat << ' ' << highSat << ' ' << lowVal << ' ' << highVal << '\n';
+    
+    std::cout << "Saved data for server!!\n";
 }
 
 void highLightBall() {
     
-    int key = -1;
-    
-    cv::Mat instrFrame = cv::Mat::zeros(300, 300, CV_8UC3);
+    cv::Mat instrFrame = cv::Mat::zeros(300, 500, CV_8UC3);
     
     cv::putText(instrFrame, "Highlight the ball", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
     
     highLightProcess(instrFrame);
     
+}
+
+void highLightRobot() {
+    cv::Mat instrFrame = cv::Mat::zeros(300, 500, CV_8UC3);
+    
+    cv::putText(instrFrame, "Highlight the robot", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
+    
+    highLightProcess(instrFrame);
+}
+
+void highLightEnemy() {
+    cv::Mat instrFrame = cv::Mat::zeros(300, 500, CV_8UC3);
+    
+    cv::putText(instrFrame, "Highlight the enemy", cv::Point(10, 30), cv::FONT_ITALIC, 1.0, cv::Scalar(0, 0, 100), 2);
+    
+    highLightProcess(instrFrame);
 }
 
 int main(int argc, const char *argv[]) {
@@ -175,12 +187,6 @@ int main(int argc, const char *argv[]) {
     
     initCaptureFromFile("data/configApp/config.txt");
     
-    cv::Mat frame1;
-    cv::Mat frame2;
-    cv::Mat frame3;
-    cv::Mat gray;
-    cv::Mat hsv;
-    
     createSettingsWindow();
     cv::namedWindow("instruction", cv::WINDOW_NORMAL);
     
@@ -189,41 +195,14 @@ int main(int argc, const char *argv[]) {
     
     
     highLightBall();
-    
-    
-    // int key = -1;
-    
-    // while(key != 27) {
-    //     key = cv::waitKey(1000 / fps);
-        
-    //     cap >> frame1;
-        
-    //     cv::GaussianBlur(frame1, frame2, cv::Size(7, 7), 1, 1);
-        
-    //     cv::cvtColor(frame2, hsv, cv::COLOR_BGR2HSV);
-        
-    //     cv::inRange(hsv, cv::Scalar(lowHue, lowSat, lowVal), cv::Scalar(highHue, highSat, highVal), frame2);
-        
-    //     
-        
-    //     cv::cvtColor(frame2, frame2, cv::COLOR_GRAY2BGR);
-        
-    //     frame3 = frame1 & frame2;
-        
-    //     cv::circle(frame1, cv::Point(xC, yC), 50, cv::Scalar(0, 0, 255), 10);
-        
-    //     
-        
-    //     cv::imshow("1", frame1);
-        
-    //     cv::imshow("2", frame2);
-        
-    //     cv::imshow("3", frame3);
-    // }
+    highLightRobot();
+    highLightEnemy();
     
     cv::destroyAllWindows();
     
     cap.release();
+    
+    std::cout << "Released all resources! Successfully finishing!\n";
     
     return 0;
 }
