@@ -47,7 +47,7 @@ void sendCom(const Command& com) {
         exit(EXIT_FAILURE);
     }
     
-    printf("Successfully sent %d bytes of data", bytesSent);
+    printf("Successfully sent %d bytes of data\n", bytesSent);
 }
 
 class ObjDetContext {

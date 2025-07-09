@@ -38,12 +38,12 @@ int main(int argc, char *argv[]) {
         
         int speed = robot.pdRegulatorX(points.robotPos.value(), points.ballPos.value()) / 4;
         
-        // std::cout << points.robotPos.value() << '\t' << points.ballPos.value() << '\t' << speed << '\n';
+        std::cout << points.robotPos.value() << '\t' << points.ballPos.value() << '\t' << speed << '\n';
         
         Command com;
         com.isKick = 0;
-        com.direction = speed > 0;
-        com.setIntensity(std::abs(speed));
+        com.direction = (bool)(speed > 0);
+        com.setIntensity((uint8_t)std::abs(speed));
         
         sendCom(com);
         
