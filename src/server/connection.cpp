@@ -27,7 +27,6 @@ uint8_t Command::convertToByte() const {
     return result;
 }
 
-    
 int Esp32UDP::establishConnection(sockaddr_in thisAddr, sockaddr_in esp32Addr) {
     
     int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
