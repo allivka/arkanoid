@@ -4,6 +4,19 @@
 #include <cstdio>
 #include <fstream>
 #include <array>
+#include <optional>
+
+#define DEFAULT_PK 1
+#define DEFAULT_DK 0.3
+#define DEFAULT_SPEED 0
+#define DEFAULT_RANGE 252
+
+class Targets{
+public:
+    std::optional<cv::Point> ballPos;
+    std::optional<cv::Point> robotPos;
+    std::optional<cv::Point> enemyPos;
+};
 
 void connectEsp() {
     sockaddr_in thisAddr;
@@ -123,13 +136,13 @@ cv::Point getObjPos(const cv::Mat& frame, const ObjDetContext& context) {
     cv::Moments m = cv::moments(binFrame);
     
     double k = m.m00;
-    double xC = m.m10 / (k + 0.01);
-    double yC = m.m01 / (k + 0.01);
+    double xC = m.m10 / (k + 0.001);
+    double yC = m.m01 / (k + 0.001);
     
-    return cv::Point(xC, yC);
+    return cv::Point(xC + context.zone.x, yC + context.zone.y);
 }
 
-std::array<cv::Point, 3> processFrame(cv::Mat frame, const ProcessingContext& context) {
+Targets processFrame(cv::Mat frame, const ProcessingContext& context) {
     
     cv::GaussianBlur(frame, frame, cv::Size(3, 3), 0, 0);
     
@@ -137,9 +150,56 @@ std::array<cv::Point, 3> processFrame(cv::Mat frame, const ProcessingContext& co
     
     std::array<cv::Point, 3> positions;
     
-    positions.at(0) = getObjPos(frame, context.ball);
-    positions.at(1) = getObjPos(frame, context.robot);
-    positions.at(2) = getObjPos(frame, context.enemy);
+    cv::Point buff;
+    Targets result;
     
-    return positions;
+    buff = getObjPos(frame, context.ball);
+    
+    if(buff.x == 0 && buff.y == 0) {
+        result.ballPos = std::optional<cv::Point>(NULL);
+    } else {
+        result.ballPos = buff;
+    }
+    
+    buff = getObjPos(frame, context.robot);
+    
+    if(buff.x == 0 && buff.y == 0) {
+        result.robotPos = std::optional<cv::Point>(NULL);
+    } else {
+        result.robotPos = buff;
+    }
+    
+    buff = getObjPos(frame, context.enemy);
+    
+    if(buff.x == 0 && buff.y == 0) {
+        result.enemyPos = std::optional<cv::Point>(NULL);
+    } else {
+        result.enemyPos = buff;
+    }
+    
+    return result;
 }
+
+template<typename T> T restrict(const T& value, const T& low ,const T& high) {
+    if(value < low) return low;
+    if(value > high) return high;
+    return value;
+}
+
+class Robot {
+public:
+    
+    int boardWidth = 960;
+    int errold = 0;
+    
+    Robot(const int& p_w) : boardWidth(p_w) {}
+    
+    int pdRegulatorX(const cv::Point& currentPos, const cv::Point& targetPos, const double& pK = DEFAULT_PK, const double& dK = DEFAULT_DK, double speed = DEFAULT_SPEED, const double& range = DEFAULT_RANGE) {
+        int err = targetPos.x - currentPos.x;
+        int u = err * pK + (err - errold) * dK;
+        speed += u;
+        speed = restrict(speed / (double)boardWidth * range, 0.0, range);
+        
+        return speed;
+    }
+};

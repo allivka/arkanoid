@@ -20,15 +20,17 @@ int main(int argc, char *argv[]) {
     
     cv::namedWindow("display", cv::WINDOW_NORMAL);
     
+    Robot robot(c.width);
+    
     while(key != 27) {
         key = cv::waitKey(1000 / c.fps);
         cap >> frame;
         
         pf = frame.clone();
         
-        std::array<cv::Point, 3> points = processFrame(pf, context);
+        Targets points = processFrame(pf, context);
         
-        cv::circle(frame, points.at(0), 50, cv::Scalar(0, 0, 150), 5);
+        cv::circle(frame, points.ballPos.value(), 50, cv::Scalar(0, 0, 150), 5);
         
         cv::imshow("display", frame);
         
