@@ -6,8 +6,8 @@
 #include <array>
 #include <optional>
 
-#define DEFAULT_PK 1
-#define DEFAULT_DK 0.3
+#define DEFAULT_PK 3.3
+#define DEFAULT_DK 0.0
 #define DEFAULT_SPEED 0
 #define DEFAULT_RANGE 252
 
@@ -180,7 +180,7 @@ public:
         int err = targetPos.x - currentPos.x;
         int u = err * pK + (err - errold) * dK;
         speed += u;
-        speed = restrict(speed / (double)boardWidth * range, -range, range);
+        speed = restrict(restrict(speed, -range, range) / (double)boardWidth * range, -range, range);
         
         return speed;
     }
