@@ -127,7 +127,7 @@ CapContext setupCap(cv::VideoCapture& cap, const::std::string& path) {
     return c;
 }
 
-cv::Point getObjPos(const cv::Mat& frame, const ObjDetContext& context) {
+std::optional<cv::Point> getObjPos(const cv::Mat& frame, const ObjDetContext& context) {
     static cv::Mat binFrame;
     
     cv::inRange(frame(context.zone), cv::Scalar(context.lowHue, context.lowSat, context.lowVal),
@@ -136,8 +136,11 @@ cv::Point getObjPos(const cv::Mat& frame, const ObjDetContext& context) {
     cv::Moments m = cv::moments(binFrame);
     
     double k = m.m00;
-    double xC = m.m10 / (k + 0.001);
-    double yC = m.m01 / (k + 0.001);
+    
+    if (k < 1) return std::nullopt;
+    
+    double xC = m.m10 / k;
+    double yC = m.m01 / k;
     
     return cv::Point(xC + context.zone.x, yC + context.zone.y);
 }
@@ -150,32 +153,11 @@ Targets processFrame(cv::Mat frame, const ProcessingContext& context) {
     
     std::array<cv::Point, 3> positions;
     
-    cv::Point buff;
     Targets result;
     
-    buff = getObjPos(frame, context.ball);
-    
-    if(buff.x == 0 && buff.y == 0) {
-        result.ballPos = std::optional<cv::Point>(NULL);
-    } else {
-        result.ballPos = buff;
-    }
-    
-    buff = getObjPos(frame, context.robot);
-    
-    if(buff.x == 0 && buff.y == 0) {
-        result.robotPos = std::optional<cv::Point>(NULL);
-    } else {
-        result.robotPos = buff;
-    }
-    
-    buff = getObjPos(frame, context.enemy);
-    
-    if(buff.x == 0 && buff.y == 0) {
-        result.enemyPos = std::optional<cv::Point>(NULL);
-    } else {
-        result.enemyPos = buff;
-    }
+    result.ballPos = getObjPos(frame, context.ball);
+    result.robotPos = getObjPos(frame, context.robot);
+    result.enemyPos = getObjPos(frame, context.enemy);
     
     return result;
 }
@@ -198,7 +180,7 @@ public:
         int err = targetPos.x - currentPos.x;
         int u = err * pK + (err - errold) * dK;
         speed += u;
-        speed = restrict(speed / (double)boardWidth * range, 0.0, range);
+        speed = restrict(speed / (double)boardWidth * range, -range, range);
         
         return speed;
     }

@@ -28,9 +28,21 @@ int main(int argc, char *argv[]) {
         
         pf = frame.clone();
         
+        try {
+        
         Targets points = processFrame(pf, context);
         
-        cv::circle(frame, points.ballPos.value(), 50, cv::Scalar(0, 0, 150), 5);
+        cv::circle(frame, points.ballPos.value(), 50, cv::Scalar(0, 150, 0), 5);
+        cv::circle(frame, points.robotPos.value(), 50, cv::Scalar(150, 0, 0), 5);
+        // cv::circle(frame, points.ballPos.value(), 50, cv::Scalar(0, 150, 0), 5);
+        
+        int speed = robot.pdRegulatorX(points.robotPos.value(), points.ballPos.value()) / 4;
+        
+        std::cout << points.robotPos.value() << '\t' << points.ballPos.value() << '\t' << speed << '\n';
+        
+        } catch(const std::bad_optional_access& err) {
+            std::cout << "Error: Failed receiveing object position(maybe no object of requested color found)\t" << err.what() << '\n';
+        }
         
         cv::imshow("display", frame);
         
