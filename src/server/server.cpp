@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
         Command com;
         com.isKick = 0;
-        com.direction = (bool)(speed < 0);
+        com.direction = (bool)(speed > 0);
         com.setIntensity((uint8_t)std::abs(speed));
         
         if(std::abs(points.ballPos.value().y - points.robotPos.value().y) <= 100 && std::abs(points.ballPos.value().x - points.robotPos.value().x) <= 100) {
