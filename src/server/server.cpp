@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
             com.isKick = 1;
         }
         
-        if(points.robotPos.value().x > context.robot.zone.x + context.robot.zone.width - 20 || points.robotPos.value().x < context.robot.zone.x + 20) {
+        if((points.robotPos.value().x > context.robot.zone.x + context.robot.zone.width - 40 && !com.direction) || (points.robotPos.value().x < context.robot.zone.x + 40 && com.direction)) {
             com.setIntensity(0);
         }
         
