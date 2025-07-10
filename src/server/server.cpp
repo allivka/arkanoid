@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
         Targets points = processFrame(pf, context);
         
         if(!points.ballPos) {
-            int speed = robot.pdRegulatorX(points.robotPos.value(), cv::Point(c.width / 2, 0)) / 4;
+            int speed = robot.pdRegulatorX(points.robotPos.value(), cv::Point(context.robot.zone.width / 2, 0 + context.robot.zone.x)) / 4;
             Command com;
             com.isKick = 0;
             com.direction = (bool)(speed < 0);
@@ -61,6 +61,8 @@ int main(int argc, char *argv[]) {
         if(std::abs(points.ballPos.value().y - points.robotPos.value().y) <= 100 && std::abs(points.ballPos.value().x - points.robotPos.value().x) <= 100) {
             com.isKick = 1;
         }
+        
+        // if()
         
         sendCom(com);
         
