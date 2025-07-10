@@ -33,7 +33,8 @@ int main(int argc, char *argv[]) {
         Targets points = processFrame(pf, context);
         
         if(!points.ballPos) {
-            int speed = robot.pdRegulatorX(points.robotPos.value(), cv::Point(context.robot.zone.width / 2, 0 + context.robot.zone.x)) / 4;
+            // int speed = robot.pdRegulatorX(points.robotPos.value(), cv::Point(context.robot.zone.width / 2 + context.robot.zone.x, 0)) / 4;
+            int speed = 0;
             Command com;
             com.isKick = 0;
             com.direction = (bool)(speed < 0);
@@ -43,6 +44,7 @@ int main(int argc, char *argv[]) {
             
             cv::circle(frame, points.robotPos.value(), 50, cv::Scalar(150, 0, 0), 5);
             cv::imshow("display", frame);
+            std::cout << "No ball found!\n";
             continue;
         }
         
