@@ -1,1 +1,1 @@
-# arkanoidCamp
+# arkanoid
