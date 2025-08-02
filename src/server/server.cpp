@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     
     cv::VideoCapture cap;
     cap.open(cameraId);
-    CapContext c = setupCap(cap, "data/configApp, config.txt");
+    CapContext c = setupCap(cap, "data/configApp/config.txt");
     
     int key = -1;
     
